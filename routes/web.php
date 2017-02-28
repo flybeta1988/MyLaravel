@@ -12,11 +12,12 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $laravel = app();
+    return view('welcome')->with('version', $laravel::VERSION);
 });
 
 Route::get('foo', function () {
-    return 'Hello World !';
+    return view('foo');
 });
 
 Route::get('news/foo', 'NewsController@foo');
