@@ -20,5 +20,9 @@ Route::get('foo', function () {
     return view('foo');
 });
 
+Route::get('user/profile', function () {
+    return 'User Profile Page !';
+})->name('profile');
+
 Route::get('news/foo', 'NewsController@foo');
 Route::resource('news', 'NewsController');

@@ -85,6 +85,10 @@
                     <a href="https://forge.laravel.com">Forge</a>
                     <a href="https://github.com/laravel/laravel">GitHub</a>
                 </div>
+
+                <ul>
+                    <li><a href="/news">新闻列表</a></li>
+                </ul>
             </div>
         </div>
     </body>

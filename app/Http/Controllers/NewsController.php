@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\News;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class NewsController extends Controller
 {
@@ -13,7 +15,8 @@ class NewsController extends Controller
      */
     public function index()
     {
-        //
+        $news_list = DB::table('news')->limit(5)->get();
+        return view('news.index', ['news_list' => $news_list]);
     }
 
     /**
@@ -23,7 +26,23 @@ class NewsController extends Controller
      */
     public function create()
     {
-        //
+        $tailf = mt_rand(1000, 9999);
+        $datetime = date('Y-m-d H:i:s');
+
+        $id = DB::table('news')->insertGetId(
+            array(
+                'title' => '北京限购政策最新消息'. $tailf ,
+                'content' => '最新北京限购政策最新消息昨晚已出台...'. $tailf,
+                'user_id' => 0,
+                'status' => 0,
+                'created_at' => $datetime
+            )
+        );
+
+        $news = DB::table('news')->where('id', $id)->first();
+        return view('news.create', array(
+            'news' => $news,
+        ));
     }
 
     /**
@@ -45,7 +64,10 @@ class NewsController extends Controller
      */
     public function show($id)
     {
-        //
+        DB::enableQueryLog();
+        $news = DB::table('news')->where('id', $id)->first();
+        //print_r(DB::getQueryLog());
+        return view('news.show', ['news' => $news]);
     }
 
     /**
@@ -56,7 +78,8 @@ class NewsController extends Controller
      */
     public function edit($id)
     {
-        //
+        $news = News::find($id);
+        return view('news.show', ['news' => $news]);
     }
 
     /**
