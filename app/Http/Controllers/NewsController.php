@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\Debugbar\Facade AS Debugbar;
 
 class NewsController extends Controller
 {
@@ -16,6 +17,7 @@ class NewsController extends Controller
     public function index()
     {
         $news_list = DB::table('news')->limit(5)->get();
+        Debugbar::info($news_list);
         return view('news.index', ['news_list' => $news_list]);
     }
 
@@ -108,5 +110,9 @@ class NewsController extends Controller
     public function foo()
     {
         echo 'Foo !!';
+    }
+
+    public function getUserList() {
+
     }
 }
