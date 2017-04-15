@@ -16,6 +16,10 @@ Route::get('/', function () {
     return view('welcome')->with('version', $laravel::VERSION);
 });
 
+Route::get('phpinfo', function () {
+    return phpinfo();
+});
+
 Route::get('foo', function () {
     return view('foo');
 });

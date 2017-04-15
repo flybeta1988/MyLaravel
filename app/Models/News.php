@@ -19,4 +19,8 @@ class News extends Model
 
         parent::__construct($attributes);
     }
+
+    public function getStatusStrAttribute () {
+        return '成功';
+    }
 }

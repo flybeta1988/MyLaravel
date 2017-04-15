@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\News;
+use App\Providers\NewsServiceProvider;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\Debugbar\Facade AS Debugbar;
@@ -16,8 +18,22 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $news_list = DB::table('news')->limit(5)->get();
-        Debugbar::info($news_list);
+        $news_list = News::all();
+        //$news_list = DB::table('news')->limit(5)->get();
+        //Debugbar::info($news_list);
+        $news_list = $news_list->reject(function ($flight) {
+           //return $flight->content;
+        });
+        //Debugbar::info($news_list);
+
+        /*News::chunk(2, function ($new_list) {
+            foreach ($new_list as $new) {
+
+            }
+        });*/
+
+        $news_list = News::simplePaginate(2);
+
         return view('news.index', ['news_list' => $news_list]);
     }
 
@@ -66,8 +82,22 @@ class NewsController extends Controller
      */
     public function show($id)
     {
-        DB::enableQueryLog();
+        $news = News::find($id);
+        //Log::debug($news);
+        Debugbar::info($news);
+        //DB::enableQueryLog();
+
         $news = DB::table('news')->where('id', $id)->first();
+        Debugbar::info($news);
+
+        $new_list = News::where('id', '>', 0)->first();
+        Debugbar::info($new_list);
+
+        $new_list = News::where('id', '>', 0)->get();
+        Debugbar::info($new_list);
+
+        $new_list = DB::table('news')->where('id', '>', 0)->get();
+        Debugbar::info($new_list);
         //print_r(DB::getQueryLog());
         return view('news.show', ['news' => $news]);
     }

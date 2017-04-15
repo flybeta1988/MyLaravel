@@ -24,6 +24,7 @@
         <div class="news">
             <h3>[{{$news->id}}]<a href="/news/{{$news->id}}"> {{$news->title}}</a></h3>
             <p>{{$news->content}}</p>
+            <p>{{$news->status_str}}</p>
         </div>
         @endforeach
     </div>
