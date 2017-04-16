@@ -21,7 +21,7 @@ class NewSaved
      */
     public function __construct()
     {
-        Log::info('Hello NewSaved !');
+        Log::info(__CLASS__. 'is work !');
     }
 
     /**

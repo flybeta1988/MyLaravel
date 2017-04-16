@@ -8,9 +8,8 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Support\Facades\Log;
 
-class NewsCreated
+class NewsUpdated
 {
     use InteractsWithSockets, SerializesModels;
 

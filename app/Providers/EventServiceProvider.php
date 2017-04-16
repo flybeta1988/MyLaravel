@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\News;
+use App\Observers\NewsObserver;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
@@ -13,8 +15,8 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'App\Events\SomeEvent' => [
-            'App\Listeners\EventListener',
+        'App\Events\NewsSavedEvent' => [
+            'App\Listeners\NewsSavedEventListener',
         ],
     ];
 
@@ -27,6 +29,6 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
 
-        //
+        //News::observe(NewsObserver::class);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Events\NewSaved;
+use App\Events\NewsSavedEvent;
 use App\Models\News;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -43,8 +45,13 @@ class NewsCMD extends Command
         //$news = $this->getChunkArrayList();
         //$news = $this->getPluckObjList();
         //$news = $this->getPluckArrayList();
-        $result = $this->create();
-        print($result->title . "\n");
+        $result = $this->getFirst();
+        dd($result->comments->toArray());
+        //print($result->title . "\n");
+    }
+
+    private function getFirst() {
+        return News::find(1);
     }
 
     private function getPluckObjList() {
@@ -65,6 +72,17 @@ class NewsCMD extends Command
         return DB::table('news')->chunk(2, function ($news) {
             print_r($news);
         });
+    }
+
+    private function save() {
+        $news = new News();
+        $news->title = '中国是最好的国家！'. mt_rand(100, 999);
+        $news->content = '111';
+        $result = $news->save();
+        if ($result) {
+            event(new NewsSavedEvent($news));
+        }
+        return ;
     }
 
     private function create() {

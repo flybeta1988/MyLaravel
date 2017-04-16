@@ -2,26 +2,28 @@
 
 namespace App\Events;
 
+use App\Models\News;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Support\Facades\Log;
 
-class NewsCreated
+class NewsSavedEvent
 {
     use InteractsWithSockets, SerializesModels;
+
+    public $new;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(News $news)
     {
-        Log::info(__CLASS__. 'is work !');
+        $this->news = $news;
     }
 
     /**

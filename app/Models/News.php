@@ -3,6 +3,9 @@ namespace App\Models;
 
 use App\Events\NewSaved;
 use App\Events\NewsCreated;
+use App\Events\NewsSavedEvent;
+use App\Events\NewsUpdated;
+use App\Observers\NewsObserver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
@@ -24,11 +27,17 @@ class News extends Model
      *
      * @var array
      */
-    protected $events = [
-        //'saved' => NewSaved::class,
+/*    protected $events = [
+        'saving' => NewSaved::class,
+        'saved' => NewSaved::class,
         'created' => NewsCreated::class,
+        'updated' => NewsUpdated::class,
         //'deleted' => UserDeleted::class,
-    ];
+    ];*/
+
+/*    protected $observables = [
+        'saved' => NewsSavedEvent::class
+    ];*/
     
     public function __construct(array $attributes = [])
     {
@@ -42,12 +51,14 @@ class News extends Model
 
         parent::__construct($attributes);
 
-        /*static::created(function ($news) {
-            Log::info('New ID:'. $news->id. ' is created, I am in News construct ...');
-        });*/
     }
 
     public function getStatusStrAttribute () {
         return '成功';
+    }
+
+    public function comments()
+    {
+        return $this->hasMany('App\Models\Comment', 'nid', 'id');
     }
 }

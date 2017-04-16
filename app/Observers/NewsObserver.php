@@ -9,6 +9,6 @@ use Illuminate\Support\Facades\Log;
 class NewsObserver
 {
     public function created(News $news) {
-        Log::info('a news is created !');
+        Log::info(__CLASS__. ' is work !');
     }
 }
