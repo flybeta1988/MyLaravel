@@ -17,9 +17,10 @@ class NotifyController extends Controller
     }
 
     public function save(Request $request) {
-        $params = array(
-
-        );
-
+        $notify = new Notify();
+        $notify->method = 'alipay';
+        $notify->order_code = 'D'.date('YmdHis').mt_rand(1000, 9999);
+        $result = $notify->save();
+        dd($result);
     }
 }

@@ -32,3 +32,4 @@ Route::get('news/foo', 'NewsController@foo');
 Route::resource('news', 'NewsController');
 
 Route::get('notify', 'NotifyController@index');
+Route::get('notify/save', 'NotifyController@save');

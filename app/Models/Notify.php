@@ -10,4 +10,10 @@ class Notify extends MongoDBModel
 
     protected $collection = 'notify';
 
+    protected $dateFormat = 'U';
+
+    protected $dates = [
+        'dtime'
+    ];
+
 }
