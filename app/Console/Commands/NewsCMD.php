@@ -45,9 +45,9 @@ class NewsCMD extends Command
         //$news = $this->getChunkArrayList();
         //$news = $this->getPluckObjList();
         //$news = $this->getPluckArrayList();
-        $result = $this->getFirst();
-        dd($result->comments->toArray());
+        //$result = $this->getFirst();
         //print($result->title . "\n");
+        $this->save();
     }
 
     private function getFirst() {

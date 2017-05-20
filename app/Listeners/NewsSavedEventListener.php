@@ -27,6 +27,6 @@ class NewsSavedEventListener
      */
     public function handle(NewsSavedEvent $event)
     {
-        Log::info(__CLASS__. ' is work !');
+        Log::info(__CLASS__. ':' . __FUNCTION__. ' is work !');
     }
 }
