@@ -30,6 +30,8 @@ Route::get('user/profile', function () {
 
 Route::get('news/foo', 'NewsController@foo');
 Route::resource('news', 'NewsController');
+Route::get('news/{id}/delete', 'NewsController@delete');
+Route::get('news/{id}/update', 'NewsController@update');
 
 Route::get('notify', 'NotifyController@index');
 Route::get('notify/save', 'NotifyController@save');

@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewSaved;
+use App\Http\Service\OrderService;
+use App\Library\Util\CacheMaintain;
+use App\ModelMiddle\NewsMiddle;
 use App\Models\News;
 use App\Providers\NewsServiceProvider;
+use App\Xnw\Config;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\Debugbar\Facade AS Debugbar;
+
 
 class NewsController extends Controller
 {
@@ -18,12 +25,13 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $news_list = News::all();
+        $idList = NewsMiddle::getGt25IdList();
+        dd($idList);
+        $id_list = [1, 3];
+        $news_list = News::xgetList($id_list);
+        $news_list = News::orderBy('id', 'DESC')->take(10)->get();
         //$news_list = DB::table('news')->limit(5)->get();
         //Debugbar::info($news_list);
-        $news_list = $news_list->reject(function ($flight) {
-           //return $flight->content;
-        });
         //Debugbar::info($news_list);
 
         /*News::chunk(2, function ($new_list) {
@@ -31,8 +39,6 @@ class NewsController extends Controller
 
             }
         });*/
-
-        $news_list = News::simplePaginate(2);
 
         return view('news.index', ['news_list' => $news_list]);
     }
@@ -46,16 +52,27 @@ class NewsController extends Controller
     {
         $tailf = mt_rand(1000, 9999);
         $datetime = date('Y-m-d H:i:s');
+        $title = '北京限购政策最新消息'. $tailf;
+        $content = '最新北京限购政策最新消息昨晚已出台...'. $tailf;
 
-        $id = DB::table('news')->insertGetId(
+        $news = new News();
+        $news->title = $title;
+        $news->content = $content;
+        $news->ctime = $datetime;
+        $news->utime = $datetime;
+        $news->xsave();
+
+        $id = $news->id;
+
+        /*$id = DB::table('news')->insertGetId(
             array(
-                'title' => '北京限购政策最新消息'. $tailf ,
-                'content' => '最新北京限购政策最新消息昨晚已出台...'. $tailf,
+                'title' => $title,
+                'content' => $content,
                 'user_id' => 0,
                 'status' => 0,
                 'created_at' => $datetime
             )
-        );
+        );*/
 
         $news = DB::table('news')->where('id', $id)->first();
         return view('news.create', array(
@@ -71,7 +88,7 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        News::xsave();
     }
 
     /**
@@ -123,7 +140,9 @@ class NewsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $news  = News::find($id);
+        $news->content = mt_rand(1000, 9999);
+        $news->xsave();
     }
 
     /**
@@ -135,6 +154,15 @@ class NewsController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function delete($id)
+    {
+        $news = News::find($id);
+        if (!is_null($news)) {
+            return $news->xdelete($id);
+        }
+        return false;
     }
 
     public function foo()

@@ -25,6 +25,8 @@
             <h3>[{{$news->id}}]<a href="/news/{{$news->id}}"> {{$news->title}}</a></h3>
             <p>{{$news->content}}</p>
             <p>{{$news->status_str}}</p>
+            <p><a href="/news/{{$news->id}}/update" target="_blank">更新</a></p>
+            <p><a href="/news/{{$news->id}}/delete" target="_blank">删除</a></p>
         </div>
         @endforeach
     </div>

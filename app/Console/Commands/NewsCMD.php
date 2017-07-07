@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Events\NewSaved;
 use App\Events\NewsSavedEvent;
+use App\ModelMiddle\NewsMiddle;
 use App\Models\News;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +48,13 @@ class NewsCMD extends Command
         //$news = $this->getPluckArrayList();
         //$result = $this->getFirst();
         //print($result->title . "\n");
-        $this->save();
+        //$this->save();
+        $this->t();
+    }
+
+    private function t () {
+        $idList = NewsMiddle::getGt25IdList();
+        var_dump($idList);
     }
 
     private function getFirst() {
