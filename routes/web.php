@@ -35,3 +35,7 @@ Route::get('news/{id}/update', 'NewsController@update');
 
 Route::get('notify', 'NotifyController@index');
 Route::get('notify/save', 'NotifyController@save');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index');
