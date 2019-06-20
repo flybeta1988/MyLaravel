@@ -25,11 +25,10 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $idList = NewsMiddle::getGt25IdList();
-        dd($idList);
-        $id_list = [1, 3];
-        $news_list = News::xgetList($id_list);
-        $news_list = News::orderBy('id', 'DESC')->take(10)->get();
+        DB::enableQueryLog();
+        $newsList = News::with('comments')->find([1, 32, 33]);
+        $sql = DB::getQueryLog();
+        //var_dump($sql);
         //$news_list = DB::table('news')->limit(5)->get();
         //Debugbar::info($news_list);
         //Debugbar::info($news_list);
@@ -40,7 +39,7 @@ class NewsController extends Controller
             }
         });*/
 
-        return view('news.index', ['news_list' => $news_list]);
+        return view('news.index', ['news_list' => $newsList]);
     }
 
     /**

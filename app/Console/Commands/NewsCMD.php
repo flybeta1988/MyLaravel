@@ -49,7 +49,21 @@ class NewsCMD extends Command
         //$result = $this->getFirst();
         //print($result->title . "\n");
         //$this->save();
-        $this->t();
+        $this->c();
+    }
+
+    private function c() {
+        $email_list = collect(['hcf01@xnw.com', 'hcf02@xnw.com', 'hcf03@xnw.com'])->toArray();
+        dd($email_list);
+    }
+
+    private function p() {
+        $news_list = range(1, 500);
+        $bar = $this->output->createProgressBar(count($news_list));
+        foreach ($news_list as $news) {
+            $bar->advance();
+        }
+        $bar->finish();
     }
 
     private function t () {

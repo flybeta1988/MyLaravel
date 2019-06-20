@@ -2,17 +2,17 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Comment;
+use App\Jobs\TestJob;
 use Illuminate\Console\Command;
 
-class CommentCMD extends Command
+class FooCmd extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'test:comment';
+    protected $signature = 'test:foo';
 
     /**
      * The console command description.
@@ -38,26 +38,8 @@ class CommentCMD extends Command
      */
     public function handle()
     {
-        $r = $this->getFirst()->price;
-        if (is_null($r)) {
-            dd('is null');
-        }
-        dd($r);
-        var_dump($this->save());
-    }
-    
-    public function save() {
-        $c = new Comment();
-        $c->content = '不错喽'. mt_rand(1000, 9999);
-        $c->nid = 1;
-        $c->save();
-    }
-
-    public function getFirst() {
-        return Comment::first();
-    }
-
-    public function getList() {
-        return Comment::all();
+        $job = new TestJob();
+        $job->onQueue('local_test')->delay(20);
+        dispatch($job);
     }
 }

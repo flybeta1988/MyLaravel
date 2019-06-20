@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\NewsCMD::class,
         Commands\CommentCMD::class,
+        Commands\FooCmd::class,
     ];
 
     /**
