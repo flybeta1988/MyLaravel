@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'a23fbcfe5369c6f27061eba14dc235f592998cf8',
+    'reference' => '53cd33c2d9f8442e407f0ed6183cd7464737a2d1',
     'name' => 'laravel/laravel',
   ),
   'versions' => 
@@ -33,6 +33,42 @@
       array (
         0 => '*',
       ),
+    ),
+    'doctrine/cache' => 
+    array (
+      'pretty_version' => '1.11.3',
+      'version' => '1.11.3.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '3bb5588cec00a0268829cc4a518490df6741af9d',
+    ),
+    'doctrine/dbal' => 
+    array (
+      'pretty_version' => '2.13.1',
+      'version' => '2.13.1.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'c800380457948e65bbd30ba92cc17cda108bf8c9',
+    ),
+    'doctrine/deprecations' => 
+    array (
+      'pretty_version' => 'v0.5.3',
+      'version' => '0.5.3.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '9504165960a1f83cc1480e2be1dd0a0478561314',
+    ),
+    'doctrine/event-manager' => 
+    array (
+      'pretty_version' => '1.1.1',
+      'version' => '1.1.1.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '41370af6a30faa9dc0368c4a6814d596e81aba7f',
     ),
     'doctrine/inflector' => 
     array (
@@ -78,6 +114,15 @@
       array (
       ),
       'reference' => '0dbf5d78455d4d6a41d186da50adc1122ec066f4',
+    ),
+    'encore/laravel-admin' => 
+    array (
+      'pretty_version' => 'v1.8.12',
+      'version' => '1.8.12.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '2c4834cf2d3160b31714292eece6df58e78c177f',
     ),
     'fzaninotto/faker' => 
     array (
@@ -346,7 +391,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'a23fbcfe5369c6f27061eba14dc235f592998cf8',
+      'reference' => '53cd33c2d9f8442e407f0ed6183cd7464737a2d1',
     ),
     'league/commonmark' => 
     array (

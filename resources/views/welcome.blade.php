@@ -75,7 +75,7 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel
+                    Laravel <span>{{app()->version()}}</span>
                 </div>
 
                 <div class="links">

@@ -20,15 +20,16 @@ class ComposerStaticInitf45bc2bdb9c022799ed06bb7a4e4fe35
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
-        '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
-        '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         '538ca81a9a966a6716601ecf48f4eaef' => __DIR__ . '/..' . '/opis/closure/functions.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
-        'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
+        '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
         '265b4faa2b3a9766332744949e83bf97' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Collections/helpers.php',
         'c7a3c339e7e14b60e06a2d7fcce9476b' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Events/functions.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
+        '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
+        '4e8671d7be9056dcd04ddd9e8e15f9cc' => __DIR__ . '/..' . '/encore/laravel-admin/src/helpers.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -121,6 +122,7 @@ class ComposerStaticInitf45bc2bdb9c022799ed06bb7a4e4fe35
         ),
         'E' => 
         array (
+            'Encore\\Admin\\' => 13,
             'Egulias\\EmailValidator\\' => 23,
         ),
         'D' => 
@@ -128,7 +130,11 @@ class ComposerStaticInitf45bc2bdb9c022799ed06bb7a4e4fe35
             'Dotenv\\' => 7,
             'Doctrine\\Instantiator\\' => 22,
             'Doctrine\\Inflector\\' => 19,
+            'Doctrine\\Deprecations\\' => 22,
+            'Doctrine\\DBAL\\' => 14,
             'Doctrine\\Common\\Lexer\\' => 22,
+            'Doctrine\\Common\\Cache\\' => 22,
+            'Doctrine\\Common\\' => 16,
             'DeepCopy\\' => 9,
         ),
         'C' => 
@@ -342,6 +348,10 @@ class ComposerStaticInitf45bc2bdb9c022799ed06bb7a4e4fe35
         array (
             0 => __DIR__ . '/..' . '/fzaninotto/faker/src/Faker',
         ),
+        'Encore\\Admin\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/encore/laravel-admin/src',
+        ),
         'Egulias\\EmailValidator\\' => 
         array (
             0 => __DIR__ . '/..' . '/egulias/email-validator/src',
@@ -358,9 +368,25 @@ class ComposerStaticInitf45bc2bdb9c022799ed06bb7a4e4fe35
         array (
             0 => __DIR__ . '/..' . '/doctrine/inflector/lib/Doctrine/Inflector',
         ),
+        'Doctrine\\Deprecations\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/deprecations/lib/Doctrine/Deprecations',
+        ),
+        'Doctrine\\DBAL\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL',
+        ),
         'Doctrine\\Common\\Lexer\\' => 
         array (
             0 => __DIR__ . '/..' . '/doctrine/lexer/lib/Doctrine/Common/Lexer',
+        ),
+        'Doctrine\\Common\\Cache\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache',
+        ),
+        'Doctrine\\Common\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/event-manager/lib/Doctrine/Common',
         ),
         'DeepCopy\\' => 
         array (
