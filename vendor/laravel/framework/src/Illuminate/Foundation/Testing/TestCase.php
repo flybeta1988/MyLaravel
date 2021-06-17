@@ -2,26 +2,36 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Mockery;
-use PHPUnit_Framework_TestCase;
-use Illuminate\Support\Facades\Facade;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Illuminate\Console\Application as Artisan;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\Queue;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\ParallelTesting;
+use Illuminate\Support\Str;
+use Mockery;
+use Mockery\Exception\InvalidCountException;
+use PHPUnit\Framework\TestCase as BaseTestCase;
+use Throwable;
 
-abstract class TestCase extends PHPUnit_Framework_TestCase
+abstract class TestCase extends BaseTestCase
 {
     use Concerns\InteractsWithContainer,
         Concerns\MakesHttpRequests,
-        Concerns\ImpersonatesUsers,
         Concerns\InteractsWithAuthentication,
         Concerns\InteractsWithConsole,
         Concerns\InteractsWithDatabase,
+        Concerns\InteractsWithExceptionHandling,
         Concerns\InteractsWithSession,
+        Concerns\InteractsWithTime,
+        Concerns\InteractsWithViews,
         Concerns\MocksApplicationServices;
 
     /**
      * The Illuminate application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -38,6 +48,13 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
      * @var array
      */
     protected $beforeApplicationDestroyedCallbacks = [];
+
+    /**
+     * The exception thrown while running an application destruction callback.
+     *
+     * @var \Throwable
+     */
+    protected $callbackException;
 
     /**
      * Indicates if we have made it through the base setUp function.
@@ -60,19 +77,21 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    protected function setUp()
+    protected function setUp(): void
     {
+        Facade::clearResolvedInstances();
+
         if (! $this->app) {
             $this->refreshApplication();
+
+            ParallelTesting::callSetUpTestCaseCallbacks($this);
         }
 
         $this->setUpTraits();
 
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
-            call_user_func($callback);
+            $callback();
         }
-
-        Facade::clearResolvedInstances();
 
         Model::setEventDispatcher($this->app['events']);
 
@@ -86,19 +105,21 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
      */
     protected function refreshApplication()
     {
-        putenv('APP_ENV=testing');
-
         $this->app = $this->createApplication();
     }
 
     /**
      * Boot the testing helper traits.
      *
-     * @return void
+     * @return array
      */
     protected function setUpTraits()
     {
         $uses = array_flip(class_uses_recursive(static::class));
+
+        if (isset($uses[RefreshDatabase::class])) {
+            $this->refreshDatabase();
+        }
 
         if (isset($uses[DatabaseMigrations::class])) {
             $this->runDatabaseMigrations();
@@ -115,19 +136,27 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
         if (isset($uses[WithoutEvents::class])) {
             $this->disableEventsForAllTests();
         }
+
+        if (isset($uses[WithFaker::class])) {
+            $this->setUpFaker();
+        }
+
+        return $uses;
     }
 
     /**
      * Clean up the testing environment before the next test.
      *
      * @return void
+     *
+     * @throws \Mockery\Exception\InvalidCountException
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->app) {
-            foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
-                call_user_func($callback);
-            }
+            $this->callBeforeApplicationDestroyedCallbacks();
+
+            ParallelTesting::callTearDownTestCaseCallbacks($this);
 
             $this->app->flush();
 
@@ -140,12 +169,42 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
             $this->serverVariables = [];
         }
 
+        if (property_exists($this, 'defaultHeaders')) {
+            $this->defaultHeaders = [];
+        }
+
         if (class_exists('Mockery')) {
-            Mockery::close();
+            if ($container = Mockery::getContainer()) {
+                $this->addToAssertionCount($container->mockery_getExpectationCount());
+            }
+
+            try {
+                Mockery::close();
+            } catch (InvalidCountException $e) {
+                if (! Str::contains($e->getMethodName(), ['doWrite', 'askQuestion'])) {
+                    throw $e;
+                }
+            }
+        }
+
+        if (class_exists(Carbon::class)) {
+            Carbon::setTestNow();
+        }
+
+        if (class_exists(CarbonImmutable::class)) {
+            CarbonImmutable::setTestNow();
         }
 
         $this->afterApplicationCreatedCallbacks = [];
         $this->beforeApplicationDestroyedCallbacks = [];
+
+        Artisan::forgetBootstrappers();
+
+        Queue::createPayloadUsing(null);
+
+        if ($this->callbackException) {
+            throw $this->callbackException;
+        }
     }
 
     /**
@@ -159,7 +218,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
         $this->afterApplicationCreatedCallbacks[] = $callback;
 
         if ($this->setUpHasRun) {
-            call_user_func($callback);
+            $callback();
         }
     }
 
@@ -172,5 +231,23 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
     protected function beforeApplicationDestroyed(callable $callback)
     {
         $this->beforeApplicationDestroyedCallbacks[] = $callback;
+    }
+
+    /**
+     * Execute the application's pre-destruction callbacks.
+     *
+     * @return void
+     */
+    protected function callBeforeApplicationDestroyedCallbacks()
+    {
+        foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
+            try {
+                $callback();
+            } catch (Throwable $e) {
+                if (! $this->callbackException) {
+                    $this->callbackException = $e;
+                }
+            }
+        }
     }
 }

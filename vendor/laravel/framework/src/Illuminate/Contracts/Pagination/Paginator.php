@@ -86,11 +86,18 @@ interface Paginator
     public function hasPages();
 
     /**
-     * Determine if there is more items in the data store.
+     * Determine if there are more items in the data store.
      *
      * @return bool
      */
     public function hasMorePages();
+
+    /**
+     * Get the base path for paginator generated URLs.
+     *
+     * @return string|null
+     */
+    public function path();
 
     /**
      * Determine if the list of items is empty or not.
@@ -100,10 +107,18 @@ interface Paginator
     public function isEmpty();
 
     /**
+     * Determine if the list of items is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty();
+
+    /**
      * Render the paginator using a given view.
      *
      * @param  string|null  $view
+     * @param  array  $data
      * @return string
      */
-    public function render($view = null);
+    public function render($view = null, $data = []);
 }

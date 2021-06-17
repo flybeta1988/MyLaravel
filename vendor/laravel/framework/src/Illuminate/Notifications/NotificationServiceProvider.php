@@ -2,9 +2,9 @@
 
 namespace Illuminate\Notifications;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Support\ServiceProvider;
 
 class NotificationServiceProvider extends ServiceProvider
 {
@@ -19,7 +19,7 @@ class NotificationServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/resources/views' => resource_path('views/vendor/notifications'),
+                __DIR__.'/resources/views' => $this->app->resourcePath('views/vendor/notifications'),
             ], 'laravel-notifications');
         }
     }

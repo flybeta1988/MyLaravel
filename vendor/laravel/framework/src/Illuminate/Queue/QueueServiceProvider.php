@@ -2,28 +2,24 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Queue\Console\WorkCommand;
-use Illuminate\Queue\Console\ListenCommand;
-use Illuminate\Queue\Console\RestartCommand;
-use Illuminate\Queue\Connectors\SqsConnector;
-use Illuminate\Queue\Connectors\NullConnector;
-use Illuminate\Queue\Connectors\SyncConnector;
-use Illuminate\Queue\Connectors\RedisConnector;
-use Illuminate\Queue\Connectors\DatabaseConnector;
-use Illuminate\Queue\Failed\NullFailedJobProvider;
+use Aws\DynamoDb\DynamoDbClient;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
+use Illuminate\Queue\Connectors\DatabaseConnector;
+use Illuminate\Queue\Connectors\NullConnector;
+use Illuminate\Queue\Connectors\RedisConnector;
+use Illuminate\Queue\Connectors\SqsConnector;
+use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
+use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
+use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
+use Illuminate\Queue\Failed\NullFailedJobProvider;
+use Illuminate\Support\Arr;
+use Illuminate\Support\ServiceProvider;
 
-class QueueServiceProvider extends ServiceProvider
+class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
     /**
      * Register the service provider.
      *
@@ -32,11 +28,9 @@ class QueueServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerManager();
-
+        $this->registerConnection();
         $this->registerWorker();
-
         $this->registerListener();
-
         $this->registerFailedJobServices();
     }
 
@@ -51,91 +45,22 @@ class QueueServiceProvider extends ServiceProvider
             // Once we have an instance of the queue manager, we will register the various
             // resolvers for the queue connectors. These connectors are responsible for
             // creating the classes that accept queue configs and instantiate queues.
-            $manager = new QueueManager($app);
-
-            $this->registerConnectors($manager);
-
-            return $manager;
+            return tap(new QueueManager($app), function ($manager) {
+                $this->registerConnectors($manager);
+            });
         });
+    }
 
+    /**
+     * Register the default queue connection binding.
+     *
+     * @return void
+     */
+    protected function registerConnection()
+    {
         $this->app->singleton('queue.connection', function ($app) {
             return $app['queue']->connection();
         });
-    }
-
-    /**
-     * Register the queue worker.
-     *
-     * @return void
-     */
-    protected function registerWorker()
-    {
-        $this->registerWorkCommand();
-
-        $this->registerRestartCommand();
-
-        $this->app->singleton('queue.worker', function ($app) {
-            return new Worker(
-                $app['queue'], $app['events'],
-                $app['Illuminate\Contracts\Debug\ExceptionHandler']
-            );
-        });
-    }
-
-    /**
-     * Register the queue worker console command.
-     *
-     * @return void
-     */
-    protected function registerWorkCommand()
-    {
-        $this->app->singleton('command.queue.work', function ($app) {
-            return new WorkCommand($app['queue.worker']);
-        });
-
-        $this->commands('command.queue.work');
-    }
-
-    /**
-     * Register the queue listener.
-     *
-     * @return void
-     */
-    protected function registerListener()
-    {
-        $this->registerListenCommand();
-
-        $this->app->singleton('queue.listener', function ($app) {
-            return new Listener($app->basePath());
-        });
-    }
-
-    /**
-     * Register the queue listener console command.
-     *
-     * @return void
-     */
-    protected function registerListenCommand()
-    {
-        $this->app->singleton('command.queue.listen', function ($app) {
-            return new ListenCommand($app['queue.listener']);
-        });
-
-        $this->commands('command.queue.listen');
-    }
-
-    /**
-     * Register the queue restart console command.
-     *
-     * @return void
-     */
-    public function registerRestartCommand()
-    {
-        $this->app->singleton('command.queue.restart', function () {
-            return new RestartCommand;
-        });
-
-        $this->commands('command.queue.restart');
     }
 
     /**
@@ -146,7 +71,7 @@ class QueueServiceProvider extends ServiceProvider
      */
     public function registerConnectors($manager)
     {
-        foreach (['Null', 'Sync', 'Database', 'Beanstalkd', 'Redis', 'Sqs'] as $connector) {
+        foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
             $this->{"register{$connector}Connector"}($manager);
         }
     }
@@ -178,19 +103,6 @@ class QueueServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the Beanstalkd queue connector.
-     *
-     * @param  \Illuminate\Queue\QueueManager  $manager
-     * @return void
-     */
-    protected function registerBeanstalkdConnector($manager)
-    {
-        $manager->addConnector('beanstalkd', function () {
-            return new BeanstalkdConnector;
-        });
-    }
-
-    /**
      * Register the database queue connector.
      *
      * @param  \Illuminate\Queue\QueueManager  $manager
@@ -211,10 +123,21 @@ class QueueServiceProvider extends ServiceProvider
      */
     protected function registerRedisConnector($manager)
     {
-        $app = $this->app;
+        $manager->addConnector('redis', function () {
+            return new RedisConnector($this->app['redis']);
+        });
+    }
 
-        $manager->addConnector('redis', function () use ($app) {
-            return new RedisConnector($app['redis']);
+    /**
+     * Register the Beanstalkd queue connector.
+     *
+     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @return void
+     */
+    protected function registerBeanstalkdConnector($manager)
+    {
+        $manager->addConnector('beanstalkd', function () {
+            return new BeanstalkdConnector;
         });
     }
 
@@ -232,6 +155,44 @@ class QueueServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register the queue worker.
+     *
+     * @return void
+     */
+    protected function registerWorker()
+    {
+        $this->app->singleton('queue.worker', function ($app) {
+            $isDownForMaintenance = function () {
+                return $this->app->isDownForMaintenance();
+            };
+
+            $resetScope = function () use ($app) {
+                return $app->forgetScopedInstances();
+            };
+
+            return new Worker(
+                $app['queue'],
+                $app['events'],
+                $app[ExceptionHandler::class],
+                $isDownForMaintenance,
+                $resetScope
+            );
+        });
+    }
+
+    /**
+     * Register the queue listener.
+     *
+     * @return void
+     */
+    protected function registerListener()
+    {
+        $this->app->singleton('queue.listener', function ($app) {
+            return new Listener($app->basePath());
+        });
+    }
+
+    /**
      * Register the failed job services.
      *
      * @return void
@@ -241,12 +202,69 @@ class QueueServiceProvider extends ServiceProvider
         $this->app->singleton('queue.failer', function ($app) {
             $config = $app['config']['queue.failed'];
 
-            if (isset($config['table'])) {
-                return new DatabaseFailedJobProvider($app['db'], $config['database'], $config['table']);
+            if (isset($config['driver']) && $config['driver'] === 'dynamodb') {
+                return $this->dynamoFailedJobProvider($config);
+            } elseif (isset($config['driver']) && $config['driver'] === 'database-uuids') {
+                return $this->databaseUuidFailedJobProvider($config);
+            } elseif (isset($config['table'])) {
+                return $this->databaseFailedJobProvider($config);
             } else {
                 return new NullFailedJobProvider;
             }
         });
+    }
+
+    /**
+     * Create a new database failed job provider.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Queue\Failed\DatabaseFailedJobProvider
+     */
+    protected function databaseFailedJobProvider($config)
+    {
+        return new DatabaseFailedJobProvider(
+            $this->app['db'], $config['database'], $config['table']
+        );
+    }
+
+    /**
+     * Create a new database failed job provider that uses UUIDs as IDs.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider
+     */
+    protected function databaseUuidFailedJobProvider($config)
+    {
+        return new DatabaseUuidFailedJobProvider(
+            $this->app['db'], $config['database'], $config['table']
+        );
+    }
+
+    /**
+     * Create a new DynamoDb failed job provider.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Queue\Failed\DynamoDbFailedJobProvider
+     */
+    protected function dynamoFailedJobProvider($config)
+    {
+        $dynamoConfig = [
+            'region' => $config['region'],
+            'version' => 'latest',
+            'endpoint' => $config['endpoint'] ?? null,
+        ];
+
+        if (! empty($config['key']) && ! empty($config['secret'])) {
+            $dynamoConfig['credentials'] = Arr::only(
+                $config, ['key', 'secret', 'token']
+            );
+        }
+
+        return new DynamoDbFailedJobProvider(
+            new DynamoDbClient($dynamoConfig),
+            $this->app['config']['app.name'],
+            $config['table']
+        );
     }
 
     /**
@@ -257,9 +275,11 @@ class QueueServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'queue', 'queue.worker', 'queue.listener', 'queue.failer',
-            'command.queue.work', 'command.queue.listen',
-            'command.queue.restart', 'queue.connection',
+            'queue',
+            'queue.connection',
+            'queue.failer',
+            'queue.listener',
+            'queue.worker',
         ];
     }
 }

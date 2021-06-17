@@ -2,18 +2,12 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Cache\Console\ClearCommand;
+use Symfony\Component\Cache\Adapter\Psr16Adapter;
 
-class CacheServiceProvider extends ServiceProvider
+class CacheServiceProvider extends ServiceProvider implements DeferrableProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
     /**
      * Register the service provider.
      *
@@ -29,25 +23,15 @@ class CacheServiceProvider extends ServiceProvider
             return $app['cache']->driver();
         });
 
+        $this->app->singleton('cache.psr6', function ($app) {
+            return new Psr16Adapter($app['cache.store']);
+        });
+
         $this->app->singleton('memcached.connector', function () {
             return new MemcachedConnector;
         });
 
-        $this->registerCommands();
-    }
-
-    /**
-     * Register the cache related console commands.
-     *
-     * @return void
-     */
-    public function registerCommands()
-    {
-        $this->app->singleton('command.cache.clear', function ($app) {
-            return new ClearCommand($app['cache']);
-        });
-
-        $this->commands('command.cache.clear');
+        $this->app->singleton(RateLimiter::class);
     }
 
     /**
@@ -58,7 +42,7 @@ class CacheServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'cache', 'cache.store', 'memcached.connector', 'command.cache.clear',
+            'cache', 'cache.store', 'cache.psr6', 'memcached.connector', RateLimiter::class,
         ];
     }
 }
