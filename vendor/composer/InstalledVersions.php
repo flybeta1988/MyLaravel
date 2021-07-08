@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '53cd33c2d9f8442e407f0ed6183cd7464737a2d1',
+    'reference' => '34a4b611c09a31970975ba30a30934be74f951fc',
     'name' => 'laravel/laravel',
   ),
   'versions' => 
@@ -174,6 +174,15 @@ private static $installed = array (
       array (
       ),
       'reference' => 'b37020aa976fa52d3de9aa904aa2522dc518f79c',
+    ),
+    'hhxsv5/laravel-s' => 
+    array (
+      'pretty_version' => 'v3.7.19',
+      'version' => '3.7.19.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '6435c55b351a2e804647ae5b39310dfc86a15a2c',
     ),
     'illuminate/auth' => 
     array (
@@ -415,7 +424,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '53cd33c2d9f8442e407f0ed6183cd7464737a2d1',
+      'reference' => '34a4b611c09a31970975ba30a30934be74f951fc',
     ),
     'league/commonmark' => 
     array (
@@ -816,6 +825,15 @@ private static $installed = array (
       array (
       ),
       'reference' => '15f7faf8508e04471f666633addacf54c0ab5933',
+    ),
+    'swoole/ide-helper' => 
+    array (
+      'pretty_version' => '4.6.7',
+      'version' => '4.6.7.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '0d1409b8274117addfe64d3ea412812a69807411',
     ),
     'symfony/console' => 
     array (

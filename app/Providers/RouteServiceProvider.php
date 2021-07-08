@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\App;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\OrderController;
+use App\Services\CourseService;
+use App\Services\OrderService;
+use App\Services\ServiceInterface;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
@@ -24,9 +28,45 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
-
         parent::boot();
+
+        $this->app->bind('foo', OrderService::class);
+
+        //https://zhuanlan.zhihu.com/p/62447326
+        $this->app->bind(ServiceInterface::class, CourseService::class);
+
+        $this->app->when(CourseController::class)
+            ->needs(ServiceInterface::class)
+            ->give(function () {
+                return new CourseService();
+            });
+        $this->app->when(OrderController::class)
+            ->needs(ServiceInterface::class)
+            ->give(function () {
+                return new OrderService();
+            });
+
+        $this->app->when('App\Http\Controllers\CourseController')
+            ->needs('$type')
+            ->give('abc');
+        $this->app->when('App\Http\Controllers\OrderController')
+            ->needs('$type')
+            ->give('efg');
+
+
+        $this->app->bind('SpeedReport', function () {
+            return 'speed';
+        });
+
+        $this->app->bind('MemoryReport', function () {
+            return 'memory';
+        });
+
+        $this->app->tag(['SpeedReport', 'MemoryReport'], 'reports');
+
+        $this->app->when(CourseController::class)
+            ->needs('$reports')
+            ->giveTagged('reports');
     }
 
     /**

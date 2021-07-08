@@ -11,14 +11,11 @@
 |
 */
 
-use Illuminate\Support\Facades\App;
-
 Route::get('/', function () {
     return view('welcome');
 });
 
-//https://zhuanlan.zhihu.com/p/62447326
-App::bind('App\Services\ServiceInterface.php', 'App\Services\OrderService.php');
-
-//Route::resource('/course/index', 'CourseController');
 Route::get('/course/index', 'CourseController@index');
+Route::get('/course/reflect', 'CourseController@reflect');
+
+Route::get('/order/index', 'OrderController@index');

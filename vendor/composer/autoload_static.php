@@ -112,6 +112,10 @@ class ComposerStaticInitf45bc2bdb9c022799ed06bb7a4e4fe35
             'Illuminate\\Support\\' => 19,
             'Illuminate\\' => 11,
         ),
+        'H' => 
+        array (
+            'Hhxsv5\\LaravelS\\' => 16,
+        ),
         'G' => 
         array (
             'GrahamCampbell\\ResultType\\' => 26,
@@ -340,6 +344,10 @@ class ComposerStaticInitf45bc2bdb9c022799ed06bb7a4e4fe35
         array (
             0 => __DIR__ . '/..' . '/laravel/framework/src/Illuminate',
         ),
+        'Hhxsv5\\LaravelS\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hhxsv5/laravel-s/src',
+        ),
         'GrahamCampbell\\ResultType\\' => 
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
@@ -423,6 +431,7 @@ class ComposerStaticInitf45bc2bdb9c022799ed06bb7a4e4fe35
     public static $classMap = array (
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'CreateAdminTables' => __DIR__ . '/../..' . '/database/migrations/2016_01_04_173148_create_admin_tables.php',
         'CreatePasswordResetsTable' => __DIR__ . '/../..' . '/database/migrations/2014_10_12_100000_create_password_resets_table.php',
         'CreateUsersTable' => __DIR__ . '/../..' . '/database/migrations/2014_10_12_000000_create_users_table.php',
         'DatabaseSeeder' => __DIR__ . '/../..' . '/database/seeds/DatabaseSeeder.php',
