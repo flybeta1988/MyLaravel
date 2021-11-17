@@ -16,6 +16,8 @@ Route::get('/', function () {
 });
 
 Route::get('/course/index', 'CourseController@index');
+Route::get('/course/hello', 'CourseController@hello');
 Route::get('/course/reflect', 'CourseController@reflect');
 
+Route::get('/order/add', 'OrderController@add');
 Route::get('/order/index', 'OrderController@index');

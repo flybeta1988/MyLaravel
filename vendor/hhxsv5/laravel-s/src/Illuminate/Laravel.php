@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class Laravel
 {
+    use LogTrait;
+
     /**@var Container */
     protected $currentApp;
 
@@ -138,6 +140,7 @@ class Laravel
 
     public function handleDynamic(IlluminateRequest $request)
     {
+        $this->info(__METHOD__);
         ob_start();
 
         if ($this->conf['is_lumen']) {

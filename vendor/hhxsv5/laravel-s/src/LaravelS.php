@@ -248,6 +248,7 @@ class LaravelS extends Server
 
     protected function handleDynamicResource(Laravel $laravel, IlluminateRequest $laravelRequest, SwooleResponse $swooleResponse)
     {
+        $this->info(__METHOD__);
         $laravel->cleanProviders();
         $laravelResponse = $laravel->handleDynamic($laravelRequest);
         $laravelResponse->headers->set('Server', $this->conf['server'], true);

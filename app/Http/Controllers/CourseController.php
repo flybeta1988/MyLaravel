@@ -9,13 +9,13 @@ class CourseController extends Controller
 {
     private $type;
     private $service;
+    private $reports;
 
     public function __construct(ServiceInterface $service, $type, $reports)
     {
         $this->type = $type;
         $this->service = $service;
-
-        var_dump($reports);
+        $this->reports = $reports;
     }
 
     public function index(Request $request) {
@@ -24,11 +24,19 @@ class CourseController extends Controller
         return $data;
     }
 
+    public function hello(Request $request) {
+        return array(
+            "msg" => 'hello laravel'
+        );
+    }
+
     public function reflect() {
         $reflector = new \ReflectionClass($this);
         $is_instantiable = $reflector->isInstantiable();
         $constructor = $reflector->getConstructor();
         $dependencies = $constructor->getParameters();
-        var_dump($is_instantiable, $constructor, $dependencies);
+        var_dump($is_instantiable);
+        print_r($constructor);
+        print_r($dependencies);
     }
 }
